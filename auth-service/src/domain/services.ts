@@ -1,27 +1,22 @@
+import axios from "axios";
+import { IRegisterParams, ILoginParams } from "./interfaces/auth.interface";
+
 export class AuthService {
   public static async register({
     email,
     password,
     name,
     lastname,
-  }: {
-    email: string;
-    password: string;
-    name: string;
-    lastname: string;
-  }) {
-    return "register service";
+  }: IRegisterParams) {
+    const response = await axios.post("http://localhost:3001/signup", {
+      email,
+      name,
+      lastname,
+    });
+    return await response.data.response;
   }
 
-  public static async login({
-    email,
-    password,
-    rememberme,
-  }: {
-    email: string;
-    password: string;
-    rememberme: boolean;
-  }) {
+  public static async login({ email, password, rememberme }: ILoginParams) {
     return "login service";
   }
 

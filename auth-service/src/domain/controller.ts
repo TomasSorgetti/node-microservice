@@ -11,7 +11,7 @@ export class AuthController {
         name,
         lastname,
       });
-      res.status(201).json({ response });
+      res.status(201).json(response);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
