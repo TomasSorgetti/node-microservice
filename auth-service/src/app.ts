@@ -1,10 +1,11 @@
 import express from "express";
-import router from "./routes";
+import { Routes } from "./domain/routes";
 
 const app = express();
+const routes = new Routes();
 
 app.use(express.json());
 
-app.use("/", router);
+app.use("/", routes.getRouter());
 
 export default app;
