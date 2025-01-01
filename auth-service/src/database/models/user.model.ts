@@ -1,6 +1,5 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../database";
-import { RefreshToken } from "./refresh_token.model";
 
 export class User extends Model {
   public id!: number;
@@ -26,6 +25,11 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    deleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     sequelize,
@@ -33,8 +37,3 @@ User.init(
     timestamps: true,
   }
 );
-
-User.hasMany(RefreshToken, {
-  foreignKey: "userId",
-  onDelete: "CASCADE",
-});

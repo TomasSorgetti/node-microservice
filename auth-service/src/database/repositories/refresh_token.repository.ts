@@ -1,4 +1,4 @@
-import { RefreshToken } from "../models/refresh_token.model";
+import { RefreshToken } from "../models";
 
 export class RefreshTokenRepository {
   public static async createRefreshToken() {}

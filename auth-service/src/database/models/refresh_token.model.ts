@@ -1,6 +1,5 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../database";
-import { User } from "./user.model";
 
 export class RefreshToken extends Model {
   public id!: number;
@@ -36,7 +35,3 @@ RefreshToken.init(
     timestamps: true,
   }
 );
-
-RefreshToken.belongsTo(User, {
-  foreignKey: "userId",
-});

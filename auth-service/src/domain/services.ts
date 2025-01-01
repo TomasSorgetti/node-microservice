@@ -1,5 +1,6 @@
 import axios from "axios";
 import { IRegisterParams, ILoginParams } from "./interfaces/auth.interface";
+import { UserRepository } from "../database/repositories/user.repository";
 
 export class AuthService {
   public static async register({
@@ -8,7 +9,14 @@ export class AuthService {
     name,
     lastname,
   }: IRegisterParams) {
-    const response = await axios.post("http://localhost:3001/signup", {
+    const existingUser = await UserRepository.findByEmail(email);
+    if (existingUser) {
+      throw new Error("User already exists");
+    }
+    const authUser = await UserRepository.createUser(email, password);
+    if (!authUser) throw new Error("Error creating user");
+
+    const response = await axios.post("http://localhost:8002/signup", {
       email,
       name,
       lastname,

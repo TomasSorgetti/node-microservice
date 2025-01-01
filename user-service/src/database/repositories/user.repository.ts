@@ -1,8 +1,12 @@
-import { User } from "../models";
+import { User } from "../models/user.model";
 
 export class UserRepository {
-  public static async createUser(email: string, password: string) {
-    return User.create({ email, password });
+  public static async createUser(
+    email: string,
+    name: string,
+    lastname: string
+  ) {
+    return User.create({ email, name, lastname });
   }
 
   public static async findByEmail(email: string) {
