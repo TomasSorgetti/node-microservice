@@ -2,7 +2,7 @@ import redisClient from "../redis";
 
 export class EmailVerificationRepository {
   public static async saveVerificationCode(userId: number, code: string) {
-    const expiresIn = 600; // El código expira en 10 minutos (600 segundos)
+    const expiresIn = 600; // 10 minutes
     try {
       await redisClient.setEx(`email_verification:${userId}`, expiresIn, code);
       console.log(
