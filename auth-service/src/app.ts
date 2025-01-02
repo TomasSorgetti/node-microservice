@@ -1,5 +1,4 @@
 import express, { Application } from "express";
-
 import { Routes } from "./domain/routes";
 import morgan from "morgan";
 import { ErrorHandler } from "./utils/error-handler";

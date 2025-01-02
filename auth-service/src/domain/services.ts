@@ -1,7 +1,13 @@
 import axios, { AxiosError } from "axios";
-import { IRegisterParams, ILoginParams } from "./interfaces/auth.interface";
+import { APIError, BadRequestError } from "../utils/app-errors";
+import {
+  IRegisterParams,
+  ILoginParams,
+  IUser,
+} from "./interfaces/auth.interface";
 import { UserRepository } from "../database/repositories/user.repository";
-import { BadRequestError } from "../utils/app-errors";
+import { envConfig } from "../config";
+import { generateVerificationCode } from "../utils/generateVerificationCode";
 
 export class AuthService {
   public static async register({
@@ -10,23 +16,59 @@ export class AuthService {
     name,
     lastname,
   }: IRegisterParams) {
-    const existingUser = await UserRepository.findByEmail(email);
+    const existingUser: IUser | null = await UserRepository.findByEmail(email);
+
+    if (existingUser && existingUser.deleted) {
+      throw new BadRequestError("User already deleted");
+    }
     if (existingUser) {
-      throw new Error("User already exists");
+      throw new BadRequestError("User already exists");
     }
     const authUser = await UserRepository.createUser(email, password);
-    if (!authUser) throw new Error("Error creating user");
+    if (!authUser) throw new APIError("Error creating user");
 
     try {
-      const url = `${process.env.GATEAWAY_URL}/user/signup`;
-      const response = await axios.post(url, {
+      // Create user in user service
+      const url = `${envConfig.USER_API_URL}/signup`;
+      await axios.post(url, {
         email,
         name,
         lastname,
       });
-      return response.data.response;
+
+      // Create Verification code
+      const verificationCode = generateVerificationCode();
+
+      // TODO => almacenar temporalmente en Redis el code
+
+      // Send email to user
+      const emailServiceResponse = await axios.post(
+        `${envConfig.EMAIL_API_URL}/signup`,
+        {
+          name,
+          email,
+          verificationCode,
+        }
+      );
+      return {
+        message: "User created successfully",
+        user: {
+          id: authUser.id,
+          email,
+          name,
+          lastname,
+        },
+      };
     } catch (error: AxiosError | any) {
-      throw new Error(`Error in external service: ${error.message}`);
+      console.log("error", error);
+      const errorMessage =
+        error.response?.data?.message || error.message || "Unknown error";
+      const statusCode = error.response?.status || 500;
+
+      throw new APIError(
+        `Error in external service: ${errorMessage}`,
+        statusCode
+      );
     }
   }
 

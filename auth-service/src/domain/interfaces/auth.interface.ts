@@ -10,3 +10,10 @@ export interface ILoginParams {
   password: string;
   rememberme: boolean;
 }
+
+export interface IUser {
+  id: number;
+  email: string;
+  password: string;
+  deleted?: boolean;
+}

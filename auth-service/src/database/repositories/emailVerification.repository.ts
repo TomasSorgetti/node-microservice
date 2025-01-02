@@ -1,19 +1,43 @@
-import { EmailVerification } from "../models";
+import redisClient from "../redis";
 
 export class EmailVerificationRepository {
-  async create(userId: number, token: string, expiresAt: Date) {
-    return await EmailVerification.create({ userId, token, expiresAt });
+  public static async saveVerificationCode(userId: number, code: string) {
+    const expiresIn = 600; // El código expira en 10 minutos (600 segundos)
+    try {
+      await redisClient.setEx(`email_verification:${userId}`, expiresIn, code);
+      console.log(
+        `Código de verificación para el usuario ${userId} guardado correctamente`
+      );
+    } catch (error) {
+      console.error(
+        `Error al guardar el código para el usuario ${userId}:`,
+        error
+      );
+    }
   }
 
-  async findByUserId(userId: number) {
-    return await EmailVerification.findOne({ where: { userId } });
+  public static async getVerificationCode(userId: number) {
+    try {
+      const code = await redisClient.get(`email_verification:${userId}`);
+      return code;
+    } catch (error) {
+      console.error(
+        `Error al obtener el código para el usuario ${userId}:`,
+        error
+      );
+      return null;
+    }
   }
 
-  async deleteByUserId(userId: number) {
-    return await EmailVerification.destroy({ where: { userId } });
-  }
-
-  async findByToken(token: string) {
-    return await EmailVerification.findOne({ where: { token } });
+  public static async deleteVerificationCode(userId: number) {
+    try {
+      await redisClient.del(`email_verification:${userId}`);
+      console.log(`Código de verificación para el usuario ${userId} eliminado`);
+    } catch (error) {
+      console.error(
+        `Error al eliminar el código para el usuario ${userId}:`,
+        error
+      );
+    }
   }
 }
