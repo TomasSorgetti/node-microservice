@@ -1,6 +1,5 @@
 import { createClient } from "redis";
 
-// Crear un cliente Redis
 const redisClient = createClient({
   url: "redis://localhost:6379",
 });
