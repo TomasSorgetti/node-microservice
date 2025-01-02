@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { IRegisterParams, ILoginParams } from "./interfaces/auth.interface";
 import { UserRepository } from "../database/repositories/user.repository";
 
@@ -16,12 +16,17 @@ export class AuthService {
     const authUser = await UserRepository.createUser(email, password);
     if (!authUser) throw new Error("Error creating user");
 
-    const response = await axios.post("http://localhost:8002/signup", {
-      email,
-      name,
-      lastname,
-    });
-    return await response.data.response;
+    try {
+      const url = `${process.env.GATEAWAY_URL}/user/signup`;
+      const response = await axios.post(url, {
+        email,
+        name,
+        lastname,
+      });
+      return response.data.response;
+    } catch (error: AxiosError | any) {
+      throw new Error(`Error in external service: ${error.message}`);
+    }
   }
 
   public static async login({ email, password, rememberme }: ILoginParams) {
