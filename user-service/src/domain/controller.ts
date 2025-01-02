@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { UserService } from "./services";
 
 export class UserController {
-  public async register(req: Request, res: Response) {
+  public async register(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, name, lastname } = req.body;
       const response = await UserService.register({
@@ -12,7 +12,7 @@ export class UserController {
       });
       res.status(201).json({ response });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      next(error);
     }
   }
 }

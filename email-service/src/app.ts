@@ -12,4 +12,5 @@ app.use(morgan("dev"));
 app.use("/", routes.getRouter());
 
 app.use(ErrorHandler);
+
 export default app;

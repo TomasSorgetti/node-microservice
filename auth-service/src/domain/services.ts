@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { IRegisterParams, ILoginParams } from "./interfaces/auth.interface";
 import { UserRepository } from "../database/repositories/user.repository";
+import { BadRequestError } from "../utils/app-errors";
 
 export class AuthService {
   public static async register({
